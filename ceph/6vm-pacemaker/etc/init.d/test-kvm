@@ -1,0 +1,40 @@
+#!/bin/bash
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+export PATH
+NAME=test-kvm
+DESC="kvm lsb pacemaker"
+HOSTNAME=`hostname`
+NODELIST="cloud1 cloud2 cloud3"
+
+case "$1" in
+  start)
+
+        for NN in $NODELIST
+        do
+            if [ "$NN" != "$HOSTNAME" ] ;
+            then
+                ssh root@$NN "virsh destroy $NAME" &
+                echo "`date +%FT%T%z` destroy" $NN $NAME >> /var/log/vm.log
+            fi
+        done ;
+        virsh start $NAME
+        echo "`date +%FT%T%z` Start" $HOSTNAME $NAME >> /var/log/vm.log
+        ;;
+  stop)
+        virsh shutdown $NAME ; sleep 10 ; virsh destroy $NAME ;
+        exit 0
+        ;;
+  restart)
+        virsh shutdown $NAME ; sleep 10 ; virsh destroy $NAME ;
+        virsh start $NAME
+        ;;
+  status)
+                echo "`date +%FT%T%z` status" $NAME >> /var/log/vm.log
+        virsh domstate $NAME | grep running
+        ;;
+  *)
+        echo "Usage:  {start|stop|restart|status}" >&2
+        exit 1
+        ;;
+esac

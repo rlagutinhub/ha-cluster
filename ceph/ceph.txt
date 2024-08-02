@@ -1,0 +1,4 @@
+mons are allowing insecure global_id reclaim
+
+ceph config set mon auth_allow_insecure_global_id_reclaim false
+

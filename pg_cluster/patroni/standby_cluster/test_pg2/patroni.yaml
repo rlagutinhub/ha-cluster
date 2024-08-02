@@ -1,0 +1,128 @@
+scope: exp-pg-ha-cluster-test
+name: exp_pg_02
+
+log:
+  level: WARNING
+  format: '%(asctime)s %(levelname)s: %(message)s'
+  dateformat: ''
+  max_queue_size: 1000
+  dir: /var/log/postgresql
+  file_num: 4
+  file_size: 25000000
+  loggers:
+    postgres.postmaster: WARNING
+    urllib3: DEBUG
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 10.104.10.199:8008
+
+etcd3:
+  cacert: /etc/patroni/ca.pem
+  cert: /etc/patroni/client.pem
+  key: /etc/patroni/client-key.pem
+  protocol: https
+  hosts:
+  - 10.60.10.155:2379
+  - 81.20.102.155:2379
+  - 188.225.34.75:2379
+
+bootstrap:
+  dcs:
+    loop_wait: 10
+    maximum_lag_on_failover: 0
+    postgresql:
+      parameters:
+        checkpoint_completion_target: 0.7
+        default_statistics_target: 100
+        effective_cache_size: 6GB
+        effective_io_concurrency: 200
+        hot_standby_feedback: true
+        log_destination: csvlog
+        log_directory: pg_log
+        log_duration: false
+        log_min_duration_statement: 1000
+        log_min_error_statement: error
+        log_min_messages: warning
+        log_statement: all
+        logging_collector: true
+        maintenance_work_mem: 512MB
+        max_connections: 200
+        max_locks_per_transaction: 64
+        max_parallel_maintenance_workers: 4
+        max_parallel_workers: 40
+        max_parallel_workers_per_gather: 4
+        max_prepared_transactions: 0
+        max_replication_slots: 10
+        max_slot_wal_keep_size: -1
+        max_wal_senders: 10
+        max_wal_size: 4096
+        max_worker_processes: 40
+        min_wal_size: 1024
+        random_page_cost: 1.1
+        shared_buffers: 2GB
+        shared_preload_libraries: pg_stat_statements
+        track_commit_timestamp: false
+        wal_buffers: 16
+        wal_keep_segments: 10
+        wal_keep_size: 4096
+        wal_level: replica
+        wal_log_hints: true
+        work_mem: 2GB
+      use_pg_rewind: true
+      use_slots: true
+    retry_timeout: 10
+    slots:
+      standbyslot:
+        database: postgres
+        type: physical
+    synchronous_mode: true
+    synchronous_mode_strict: false
+    ttl: 30
+  initdb:
+  - encoding: UTF8
+  - data-checksums
+  pg_hba:
+  - host all postgres all md5
+  - host replication repl all md5
+
+  users:
+    postgres:
+      password: password
+      options:
+        - createrole
+        - createdb
+    repl:
+      password: password
+      options:
+        - replication
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: 10.104.10.199:5432
+  data_dir: /var/lib/postgresql/15/main
+  bin_dir: /usr/lib/postgresql/15/bin
+  config_dir: /var/lib/postgresql/15/main
+  pgpass: /var/lib/postgresql/.pgpass
+  pg_hba:
+    - local all all trust
+    - host all postgres all md5
+    - host replication repl all md5
+    - host all mhasanov all md5
+    - host all dba_ruben all md5
+  authentication:
+    replication:
+      username: repl
+      password: password
+    superuser:
+      username: postgres
+      password: password
+  parameters:
+    unix_socket_directories: '/var/run/postgresql'
+    port: 5432
+  callbacks:
+    on_start: /etc/patroni/callback.sh
+    on_stop: /etc/patroni/callback.sh
+    on_restart: /etc/patroni/callback.sh
+    on_reload: /etc/patroni/callback.sh
+    on_role_change: /etc/patroni/callback.sh

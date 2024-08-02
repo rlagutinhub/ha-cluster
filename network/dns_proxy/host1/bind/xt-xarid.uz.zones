@@ -1,0 +1,19 @@
+;
+; BIND data file for xt-xarid.uz
+;
+$TTL    300
+@       IN      SOA     xt-xarid.uz. root.xt-xarid.uz. (
+                         2021121400     ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      ns2.xt-xarid.uz.
+@                       IN      A       217.171.171.43
+;@                       IN      A       87.237.237.61
+ns2                     IN      A       217.171.171.43
+ns1                     IN      A       87.237.237.61
+
+www                     IN      A       217.171.171.43
+api                     IN      A       217.171.171.43

@@ -1,0 +1,21 @@
+auto eth2
+iface eth2 inet manual
+bond-master bond0
+
+auto eth3
+iface eth3 inet manual
+bond-master bond0
+
+auto bond0
+iface bond0 inet manual
+bond-mode 4
+bond-miimon 100
+bond-lacp-rate 1
+bond-xmit-hash-policy layer2+3
+bond-slaves eth2 eth3
+
+auto vlan400
+iface vlan400 inet static
+address 10.20.0.1
+netmask 255.255.255.252
+vlan_raw_device bond0

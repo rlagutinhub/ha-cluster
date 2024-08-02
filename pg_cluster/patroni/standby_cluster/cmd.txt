@@ -1,0 +1,15 @@
+psql -Upostgres -p5432 -c "SELECT pg_create_physical_replication_slot('standbyslot');"
+psql -Upostgres -p5432 -c "SELECT pg_drop_replication_slot('standbyslot');"
+psql -Upostgres -p5432 -c "select * from pg_replication_slots;"
+psql -Upostgres -p5432 -c "select * from pg_stat_replication;"
+
+psql -Upostgres -p5432 -c "create database aaaa;"
+
+patronictl -c /etc/patroni/patroni.yml edit-config --force -s standby_cluster.host='' -s standby_cluster.port='' -s standby_cluster.create_replica_methods='' -s standby_cluster.primary_slot=''
+patronictl -c /etc/patroni/patroni.yml  edit-config --force -s standby_cluster.host='10.104.10.199' -s standby_cluster.port='5432' -s standby_cluster.create_replica_methods='- basebackup'
+patronictl -c /etc/patroni/patroni.yml  edit-config --force -s standby_cluster.host='10.104.10.198' -s standby_cluster.port='5432' -s standby_cluster.create_replica_methods='- basebackup'
+su -c "/usr/lib/postgresql/15/bin/pg_ctl stop -D  /var/lib/postgresql/15/main" postgres
+su -c "/usr/lib/postgresql/15/bin/pg_ctl start -D  /var/lib/postgresql/15/main" postgres
+su -c "/usr/lib/postgresql/15/bin/pg_resetwal  /var/lib/postgresql/15/main -f" postgres
+
+

@@ -1,0 +1,75 @@
+https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+
+
+ceph-deploy install --stable octopus vm1 vm2 vm3
+ceph-deploy new vm1 vm2 vm3
+ceph-deploy mon create vm1 vm2 vm3
+ceph-deploy gatherkeys vm1 vm2 vm3
+
+ceph-deploy admin vm1 vm2 vm3
+ceph-deploy mgr create vm1 vm2 vm3 
+
+ceph-deploy osd create --data /dev/vdb vm1 
+ceph-deploy osd create --data /dev/vdb vm2 
+ceph-deploy osd create --data /dev/vdb vm3 
+
+ceph-deploy osd create --data /dev/vdc vm1 
+ceph-deploy osd create --data /dev/vdc vm2 
+ceph-deploy osd create --data /dev/vdc vm3 
+
+ceph osd pool create rbd
+ceph osd pool application enable rbd rbd
+
+ceph-deploy mds create vm1 vm2 vm3
+ceph osd pool create cephfs_data
+ceph osd pool create cephfs_meta
+ceph fs new cephfs cephfs_meta cephfs_data
+
+ceph-deploy install --rgw vm1 vm2 vm3
+ceph-deploy rgw create vm1 vm2 vm3
+
+ceph mgr module disable dashboard
+ceph mgr module enable dashboard
+
+ceph config set mgr mgr/dashboard/server_addr $IP
+ceph config set mgr mgr/dashboard/server_port $PORT
+ceph config set mgr mgr/dashboard/ssl_server_port 8443
+
+ceph dashboard ac-user-create admin password administrator
+
+radosgw-admin user create --uid=admin --display-name=admin --system
+ceph dashboard set-rgw-api-access-key XXYZE3KEZB5BPRL9QPK8
+ceph dashboard set-rgw-api-secret-key JZTmAVL70Aou9F3XF80gK7htvAJjNX5nFtpeGIo1
+
+sudo radosgw-admin user create --uid="testuser" --display-name="First User"
+
+ceph config set mon auth_allow_insecure_global_id_reclaim false
+
+########### tests ###################
+
+ceph -s
+rados df ; ceph osd df
+rados lspools ; ceph osd lspools
+ceph osd tree
+
+mount -t ceph 192.168.1.10,192.168.1.11,192.168.1.12:/ /mnt/cephfs -o name=admin
+
+rbd create rbd/test.img --size 30M
+rbd ls
+rbd info
+
+
+qemu-img convert -f qcow2 -O rbd bionic-server-cloudimg-amd64.img rbd:cephfs_data/bionic-server-cloudimg-amd64.img
+
+rbd map rbd/test1.img
+rbd unmap /dev/rbd0
+
+
+radosgw-admin user info --uid="admin"
+s3cmd mb s3://testbacket
+s3cmd ls
+s3cmd put .s3cfg s3://testbacket/path/path2/s3cfg.default
+s3cmd rm s3://testbacket/path/path2/s3cfg.default
+s3cmd rb s3://testbacket
+

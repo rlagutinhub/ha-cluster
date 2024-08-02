@@ -1,0 +1,1 @@
+PGPASSWORD="postgres" pg_receivewal --no-loop --synchronous --slot=stream_wals --directory=/var/lib/postgresql/14/STREAM_WALS --verbose -h127.0.0.1 -Upostgres

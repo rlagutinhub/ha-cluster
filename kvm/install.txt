@@ -1,0 +1,7 @@
+wget https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+
+apt install libguestfs-tools
+
+virt-customize -a bionic-server-cloudimg-amd64.img --root-password password:123
+
+qemu-img convert -f qcow2 -O rbd bionic-server-cloudimg-amd64.img rbd:rbd/bionic-server-cloudimg-amd64.img

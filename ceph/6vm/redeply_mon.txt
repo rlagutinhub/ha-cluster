@@ -1,0 +1,6 @@
+cp /var/lib/ceph/mon/ceph-vm1/keyring /tmp
+ceph mon getmap -o /tmp/monmap
+ceph-mon -i vm1 --mkfs --monmap /tmp/monmap --keyring /tmp/keyring
+chown ceph:ceph -R /var/lib/ceph/mon
+
+

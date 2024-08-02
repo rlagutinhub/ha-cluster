@@ -1,0 +1,36 @@
+wget https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64 -Ocfssl
+wget https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64 -Ocfssljson
+git clone https://github.com/etcd-io/etcd
+wget https://github.com/etcd-io/etcd/releases/download/v3.5.11/etcd-v3.5.11-darwin-amd64.zip
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert certs/ca.pem --cert certs/client.pem --key certs/client-key.pem endpoint health
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert certs/ca.pem --cert certs/client.pem --key certs/client-key.pem endpoint status -w table
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert certs/ca.pem --cert certs/client.pem --key certs/client-key.pem member list -w table
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem get fff
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem get --from-key ''  --keys-only
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem put fff aaaaaaaaaaaaaaaaaaaaaa
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem elect one infra0
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem member remove infra0
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem member update 8e9e05c52164694d --peer-urls=https://87.237.235.78:2380
+
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem member remove fe1addc65f739cd7
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem member add infra0 --peer-urls=https://81.20.102.155:2380
+
+
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem snapshot save snapshot.db
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem snapshot status --write-out=table snapshot.db
+
+ETCDCTL_API=3 ./etcdctl  --endpoints="87.237.235.78:2379,81.20.102.155:2379,188.225.34.75:2379" --cacert ca.pem --cert client.pem --key client-key.pem snapshot restore snapshot.db \
+  --name infra0 \
+  --data-dir /tmp/etcd \
+  --initial-cluster infra0=https://81.20.102.155:2380,infra1=https://188.225.34.75:2380,infra2=https://87.237.235.78:2380 \
+  --initial-cluster-token etcd-cluster-3 \
+  --initial-advertise-peer-urls https://81.20.102.155:2380 \
+  --cert=certs/81.20.102.155.pem \
+  --key=certs/81.20.102.155-key.pem \
+  --cacert=certs/ca.pem
+  

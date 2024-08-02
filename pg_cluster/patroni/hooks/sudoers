@@ -1,0 +1,1 @@
+postgres ALL=(root) NOPASSWD: /sbin/ip addr del 10.60.10.24/24 dev eth2, /sbin/ip addr add 10.60.10.24/24 dev eth2, /usr/sbin/arping

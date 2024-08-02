@@ -1,0 +1,6 @@
+<secret ephemeral='no' private='no'>
+  <uuid>821d4ff6-1455-11eb-bf60-6fc581bb11bd</uuid>
+  <usage type='ceph'>
+    <name>client.admin secret</name>
+  </usage>
+</secret>

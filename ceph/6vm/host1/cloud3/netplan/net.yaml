@@ -1,0 +1,13 @@
+network:
+    version: 2
+    renderer: networkd
+    ethernets:
+        enp1s0:
+            dhcp4: no
+    bridges:
+        cloud-br0:
+            interfaces: [enp1s0]
+            addresses: [192.168.1.23/24]
+            gateway4: 192.168.1.20
+            nameservers:
+                addresses: [8.8.8.8]
