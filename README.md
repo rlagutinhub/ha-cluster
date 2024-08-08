@@ -15,3 +15,14 @@
   * etcd пишет ключи-значения на диск. Это такая конвенция. Если у вас postgres в моменте будет сильно нагружен - не факт, что сервер etcd отработает так, как нужно и с минимальными задержками.
 
   Итого: так делать можно, но на проде нужно использовать отдельные серваки для etcd. Можно брать самые слабые, но на них ничего другого быть не должно, кроме etcd ну и может быть в редких случая самых легковесных приложений.
+
+## pgbench
+
+```
+sync && echo 1 > /proc/sys/vm/drop_caches &&
+psql -U postgres -p 5432 -c "drop database test;" &&
+psql -U postgres -p 5432 -c "checkpoint;" &&
+psql -U postgres -p 5432 -c "create database test;" &&
+pgbench -i -s 100 -U postgres test &&
+pgbench -c 100 -t 100 -j 40 -U postgres test
+```
